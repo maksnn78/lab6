@@ -9,3 +9,11 @@ add_subdirectory(formatter_ex_lib)
 add_subdirectory(solver_lib)
 add_subdirectory(hello_world_application)
 add_subdirectory(solver_application)
+
+option(BUILD_TESTS "Build tests" ON)
+
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(third-party/gtest)
+  add_subdirectory(tests)
+endif()
