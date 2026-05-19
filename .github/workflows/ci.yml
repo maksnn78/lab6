@@ -2,12 +2,13 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,10 +17,10 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y cmake g++
 
-      - name: Configure
+      - name: Configure project
         run: cmake -S . -B build -DBUILD_TESTS=ON
 
-      - name: Build
+      - name: Build project
         run: cmake --build build
 
       - name: Run tests
