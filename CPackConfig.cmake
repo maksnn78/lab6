@@ -1,7 +1,7 @@
 include(InstallRequiredSystemLibraries)
 
 set(CPACK_PACKAGE_NAME                "solver")
-set(CPACK_PACKAGE_CONTACT             "maksnn78@example.com")
+set(CPACK_PACKAGE_CONTACT             "maksnn78@gmail.com")
 set(CPACK_PACKAGE_VERSION_MAJOR       ${SOLVER_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR       ${SOLVER_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH       ${SOLVER_VERSION_PATCH})
@@ -12,14 +12,26 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Solver - solves quadratic equations")
 set(CPACK_RESOURCE_FILE_LICENSE       ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE)
 set(CPACK_RESOURCE_FILE_README        ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
 
+# --- Linux DEB ---
+set(CPACK_DEBIAN_PACKAGE_NAME        "solver")
+set(CPACK_DEBIAN_PACKAGE_PREDEPENDS  "libc6 (>= 2.17)")
+set(CPACK_DEBIAN_PACKAGE_RELEASE     1)
+
+# --- Linux RPM ---
 set(CPACK_RPM_PACKAGE_NAME     "solver")
 set(CPACK_RPM_PACKAGE_LICENSE  "Apache-2.0")
 set(CPACK_RPM_PACKAGE_GROUP    "Applications/Engineering")
 set(CPACK_RPM_CHANGELOG_FILE   ${CMAKE_CURRENT_SOURCE_DIR}/ChangeLog.md)
 set(CPACK_RPM_PACKAGE_RELEASE  1)
 
-set(CPACK_DEBIAN_PACKAGE_NAME        "solver")
-set(CPACK_DEBIAN_PACKAGE_PREDEPENDS  "libc6 (>= 2.17)")
-set(CPACK_DEBIAN_PACKAGE_RELEASE     1)
+# --- Windows MSI (WiX) ---
+set(CPACK_WIX_UPGRADE_GUID        "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")
+set(CPACK_WIX_PRODUCT_ICON        "")
+set(CPACK_WIX_UI_BANNER           "")
+set(CPACK_WIX_UI_DIALOG           "")
+
+# --- macOS DMG ---
+set(CPACK_DMG_VOLUME_NAME         "solver")
+set(CPACK_DMG_FORMAT              "UDZO")
 
 include(CPack)

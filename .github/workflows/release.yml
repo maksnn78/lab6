@@ -6,18 +6,10 @@ on:
       - 'v*'
 
 jobs:
+
   build-deb:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: windows-msi-package
-          path: packages/
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: macos-dmg-package
-          path: packages
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -31,7 +23,7 @@ jobs:
       - name: Build
         run: cmake --build _build
 
-      - name: Package
+      - name: Package DEB + TGZ + ZIP
         run: |
           cd _build
           cpack -G DEB
@@ -62,16 +54,45 @@ jobs:
       - name: Build
         run: cmake --build _build
 
-      - name: Package
+      - name: Package RPM
         run: cd _build && cpack -G RPM
 
       - uses: actions/upload-artifact@v4
         with:
           name: linux-rpm-packages
           path: _build/*.rpm
+
   build-msi:
-      runs-on: windows-latest
-      steps:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install WiX Toolset
+        run: |
+          dotnet tool install --global wix
+          wix extension add WixToolset.UI.wixext
+
+      - name: Configure
+        run: cmake -S . -B _build -DBUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build _build --config Release
+
+      - name: Package MSI
+        run: |
+          cd _build
+          cpack -G WIX -C Release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-msi-packages
+          path: _build/*.msi
+
+  build-dmg:
+    runs-on: macos-latest
+    steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -80,7 +101,16 @@ jobs:
         run: cmake -S . -B _build -DBUILD_TESTS=OFF
 
       - name: Build
-        run: cmake 
+        run: cmake --build _build
+
+      - name: Package DMG
+        run: cd _build && cpack -G DragNDrop
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg-packages
+          path: _build/*.dmg
+
   release:
     needs: [build-deb, build-rpm, build-msi, build-dmg]
     runs-on: ubuntu-latest
@@ -97,6 +127,16 @@ jobs:
           name: linux-rpm-packages
           path: packages/
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-msi-packages
+          path: packages/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-dmg-packages
+          path: packages/
+
       - name: List packages
         run: ls -la packages/
 
@@ -104,4 +144,3 @@ jobs:
         with:
           files: packages/*
           generate_release_notes: true
-   
