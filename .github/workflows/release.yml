@@ -69,14 +69,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install WiX Toolset
-        run: |
-          dotnet tool install --global wix
-          wix extension add WixToolset.UI.wixext --global
-          wix extension add WixToolset.Bal.wixext --global
+      - name: Install WiX Toolset v4
+        run: dotnet tool install --global wix --version 4.0.5
 
-      - name: Accept WiX EULA
-        run: wix --accept-eula
+      - name: Add WiX extension
+        run: wix extension add WixToolset.UI.wixext/4.0.5 --global
 
       - name: Configure
         run: cmake -S . -B _build -DBUILD_TESTS=OFF
