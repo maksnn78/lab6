@@ -84,7 +84,14 @@ jobs:
       - name: Package MSI
         run: |
           cd _build
-          cpack -G WIX -C Release
+          cpack -G WIX -C Release || true
+
+      - name: Show WiX log
+        if: always()
+        shell: pwsh
+        run: |
+          $log = "D:/a/lab6/lab6/_build/_CPack_Packages/win64/WIX/wix.log"
+          if (Test-Path $log) { Get-Content $log } else { Write-Host "Log not found" }
 
       - uses: actions/upload-artifact@v4
         with:
