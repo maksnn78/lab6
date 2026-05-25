@@ -9,6 +9,15 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-msi-package
+          path: packages/
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-dmg-package
+          path: packages
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -62,7 +71,7 @@ jobs:
           path: _build/*.rpm
 
   release:
-    needs: [build-deb, build-rpm]
+    needs: [build-deb, build-rpm, build-msi, build-dmg]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -84,3 +93,44 @@ jobs:
         with:
           files: packages/*
           generate_release_notes: true
+   build-msi:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -S . -B _build -DBUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build _build --config Release
+
+      - name: Package MSI
+        run: cd _build && cpack -G WIX
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-msi-package
+          path: _build/*.msi
+
+  build-dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -S . -B _build -DBUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build _build
+
+      - name: Package DMG
+        run: cd _build && cpack -G DragNDrop
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg-package
+          path: _build/*.dmg
