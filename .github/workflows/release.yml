@@ -70,11 +70,13 @@ jobs:
           submodules: recursive
 
       - name: Install WiX Toolset
-        env:
-          WIX_ACCEPTED_EULA: true
         run: |
           dotnet tool install --global wix
           wix extension add WixToolset.UI.wixext --global
+          wix extension add WixToolset.Bal.wixext --global
+
+      - name: Accept WiX EULA
+        run: wix --accept-eula
 
       - name: Configure
         run: cmake -S . -B _build -DBUILD_TESTS=OFF
